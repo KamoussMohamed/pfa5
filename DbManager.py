@@ -1,7 +1,6 @@
 import os
-#import json
+import json
 from pymongo import MongoClient
-
 
 imageList = os.listdir("images/")
 namesList = []
@@ -11,8 +10,8 @@ client = MongoClient('mongodb://localhost:27017')
 db = client['presenceAI']
 collections = ["studentsCollection", "presentCollection", "absentCollection"]
 
-
 def storeStudents():
+    
     for imageName in imageList:
         nameWithoutExtension = imageName.replace('.png', '')
         nameParts = nameWithoutExtension.split()
@@ -25,8 +24,6 @@ def storeStudents():
                 namesList.append(' '.join(currentName))
                 currentName = []
 
-
-
     for name in namesList:
         frag = name.split(" ")
         firstName = frag[0]
@@ -36,11 +33,22 @@ def storeStudents():
             "lastName": middleAndLastNames
         }
         all_data.append(person_data)
-    
+
+    with open("data.json", "w") as file:
+        json.dump(all_data, file, indent=4)
 
     collection = db[collections[0]]
-    for data in all_data:
-        collection.insert_one(data)
-        
-    # with open("data.json", "w") as file:
-    #     json.dump(all_data, file, indent=4)
+    existing_records = list(collection.find({}, {"_id": 0}))
+
+    new_records = []
+    for person in all_data:
+        if person not in existing_records:
+            new_records.append(person)
+
+    if new_records:
+        collection.insert_many(new_records)
+        print(f"Added {len(new_records)} new records to the database")
+    else:
+        print("No new records to add")
+
+storeStudents()

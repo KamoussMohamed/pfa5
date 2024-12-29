@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webcam Viewer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        h1 {
+            color: #333;
+            margin-top: 20px;
+        }
+
+        video {
+            width: 80%;
+            max-width: 640px;
+            margin-top: 20px;
+            border: 2px solid #444;
+            border-radius: 8px;
+        }
+
+        #error {
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Webcam Viewer</h1>
+    <video id="webcam" autoplay playsinline></video>
+    <div id="error"></div>
+
+    <script>
+        const videoElement = document.getElementById('webcam');
+        const errorElement = document.getElementById('error');
+
+        async function startWebcam() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                videoElement.srcObject = stream;
+            } catch (error) {
+                errorElement.textContent = `Error accessing webcam: ${error.message}`;
+            }
+        }
+
+        startWebcam();
+    </script>
+</body>
+</html>
